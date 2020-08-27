@@ -3,43 +3,9 @@ import collections
 import time
 
 import cv2
-import numpy as np
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras import backend as K
 
+from gest import model
 from gest.cv_gui import text
-
-img_width, img_height = 150, 150
-if K.image_data_format() == 'channels_first':
-    input_shape = (3, img_width, img_height)
-else:
-    input_shape = (img_width, img_height, 3)
-
-
-def build_model():
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
-
-    return model
 
 
 parser = argparse.ArgumentParser()
@@ -66,20 +32,16 @@ class App:
             if not ret:
                 break
             now = time.time()
-            score = model.predict(
-                cv2.resize(frame, (img_width, img_height)).reshape((1, *input_shape)) / 255.
-            )[0][0]
+            score = model.score(self.model, frame)
             history.append(HistoryEntry(now, score))
-            display = np.array(frame[:, ::-1, :])
+            display = cv2.flip(frame, 1)
             if len(history) == self.history_size:
-                fps = len(history) / (history[-1].at - history[0].at)
+                fps = (len(history) - 1) / (history[-1].at - history[0].at)
                 avg_score = sum(e.score for e in history) / len(history)
                 display = text(display, f'fps {fps:.0f}, score {avg_score:.0%}, avg over {len(history)}')
                 history.popleft()
             cv2.imshow('Demo', display)
-
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
+            if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
                 break
 
         video_capture.release()
@@ -88,10 +50,8 @@ class App:
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    model = build_model()
-    model.load_weights(args.model_path)
     App(
         camera=args.camera,
-        model=model,
+        model=model.load(args.model_path),
         history_size=args.history,
     ).run()

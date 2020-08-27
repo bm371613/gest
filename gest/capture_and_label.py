@@ -49,7 +49,7 @@ class App:
             if not ret:
                 break
             now = time.time()
-            display = np.array(frame[:, ::-1, :])
+            display = cv2.flip(frame, 1)
             if countdown:
                 display = text(
                     display,
@@ -68,7 +68,7 @@ class App:
             cv2.imshow('Capture and Label', display)
 
             key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
+            if key == 27:  # esc to quit
                 break
             elif ord('0') <= key <= ord('9'):
                 history.append(self.save_label(
