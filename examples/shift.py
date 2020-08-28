@@ -10,7 +10,7 @@ from gest.cv_gui import text
 parser = argparse.ArgumentParser()
 parser.add_argument("model_path", help="Model path")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
-parser.add_argument("--acc-weight", help="Camera index", type=float, default=1)
+parser.add_argument("--acc-weight", help="Camera index", type=float, default=3)
 
 args = parser.parse_args()
 

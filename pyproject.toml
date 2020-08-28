@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "gest"
+version = "0.1.0"
+description = "Gesture recognition"
+authors = ["Bartosz Marcinkowski <b.marcinkowski@leomail.pl>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+numpy = "*"
+opencv-python = "^4.4.0"
+tensorflow = "^2.3.0"
+Pillow = "^7.2.0"
+keras = "^2.4.3"
+pynput = {version = "^1.6.8", optional = true }
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.extras]
+examples = ["pynput"]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
