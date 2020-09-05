@@ -84,3 +84,7 @@ class AnnotatedGestureManager(base.AnnotatedGestureManager):
         path.parent.mkdir(parents=True, exist_ok=True)
         cv2.imwrite(str(path), annotated_gesture.frame)
         return SavedAnnotatedGesture(path, self.label)
+
+    def saved(self) -> typing.Iterable[SavedAnnotatedGesture]:
+        for path in sorted(self.data_path.glob('*.jpg')):
+            yield SavedAnnotatedGesture(path, self.label)

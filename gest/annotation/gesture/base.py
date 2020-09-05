@@ -38,3 +38,6 @@ class AnnotatedGestureManager:
 
     def save(self, annotated_gesture: AnnotatedGesture) -> SavedAnnotatedGesture:
         raise NotImplementedError()
+
+    def saved(self) -> typing.Iterable[SavedAnnotatedGesture]:
+        raise NotImplementedError()

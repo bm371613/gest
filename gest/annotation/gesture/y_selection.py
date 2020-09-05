@@ -103,3 +103,7 @@ class AnnotatedGestureManager(base.AnnotatedGestureManager):
         cv2.imwrite(str(path), annotated_gesture.frame)
         json.dump(annotated_gesture.y, path.with_suffix('.json').open('w'))
         return SavedAnnotatedGesture(path, self.label)
+
+    def saved(self) -> typing.Iterable[SavedAnnotatedGesture]:
+        for path in sorted(self.data_path.glob('*.jpg')):
+            yield SavedAnnotatedGesture(path, self.label)
