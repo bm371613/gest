@@ -5,7 +5,7 @@ import time
 import cv2
 import numpy as np
 
-from gest.annotation import StaticGestureManager
+from gest.annotation import gesture
 from gest.cv_gui import text
 
 parser = argparse.ArgumentParser()
@@ -21,8 +21,9 @@ class App:
         self.data_path = data_path
         self.countdown = countdown
         self.annotated_gesture_managers = [
-            StaticGestureManager('no gesture', self.data_path / '0'),
-            StaticGestureManager('open hand', self.data_path / '1'),
+            gesture.static.AnnotatedGestureManager('no gesture', self.data_path / '0'),
+            gesture.static.AnnotatedGestureManager('open hand', self.data_path / '1'),
+            gesture.y_selection.AnnotatedGestureManager('pinch', self.data_path / '2'),
         ]
 
         self.history = []
