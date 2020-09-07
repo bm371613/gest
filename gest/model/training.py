@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("data_path", help="Data path")
     parser.add_argument("model_path", help="Model path")
-    parser.add_argument("--epochs", help="Camera index", type=int, default=1)
+    parser.add_argument("--epochs", help="Number of epochs", type=int, default=1)
     args = parser.parse_args()
 
     dataset = ImageFolder(
