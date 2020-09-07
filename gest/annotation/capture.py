@@ -12,17 +12,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument("data_path", help="Data path")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--countdown", help="Countdown interval", type=int, default=3)
+parser.add_argument('--order', nargs='+', help='Auto mode order', type=int, default=())
 
 
 class App:
 
-    def __init__(self, camera, data_path, countdown):
+    def __init__(self, camera, data_path, countdown, order):
         self.camera = camera
         self.countdown = countdown
         self.annotated_gesture_managers = annotated_gesture_managers(data_path)
+        self.order = order or list(range(len(self.annotated_gesture_managers)))
 
         self.history = []
-        self.gesture_ix = -1
+        self.order_ix = 0
+        self.gesture_ix = None
         self.auto = False
         self.capturing_session = None
         self.playback_session = None
@@ -82,10 +85,10 @@ class App:
                 self.start_capturing(at)
 
     def start_capturing(self, at, gesture_ix=None, countdown=None):
-        self.gesture_ix = (
-            gesture_ix if gesture_ix is not None
-            else (self.gesture_ix + 1) % len(self.annotated_gesture_managers)
-        )
+        if gesture_ix is None:
+            gesture_ix = self.order[self.order_ix % len(self.order)]
+            self.order_ix += 1
+        self.gesture_ix = gesture_ix
         manager = self.annotated_gesture_managers[self.gesture_ix]
         self.capturing_session = manager.start_capturing_session(
             at,
@@ -114,4 +117,5 @@ if __name__ == '__main__':
         camera=args.camera,
         data_path=pathlib.Path(args.data_path),
         countdown=args.countdown,
+        order=args.order,
     ).run()
