@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("data_path", help="Data path")
 parser.add_argument("gesture_ix", help="Gesture index", type=int)
 parser.add_argument("--ix", help="Annotation index", type=int, default=1)
-parser.add_argument("--time", help="Playback time", type=int, default=0)
+parser.add_argument("--time", help="Playback time", type=float, default=1)
 
 
 class App:
