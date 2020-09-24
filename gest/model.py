@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import onnxruntime
 
-CLASS_COUNT = 3
 IMAGE_WIDTH = 160
 IMAGE_HEIGHT = 120
 
