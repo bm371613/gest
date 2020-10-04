@@ -8,15 +8,15 @@ from gest.annotation.gesture import annotated_gesture_managers
 
 parser = argparse.ArgumentParser()
 parser.add_argument("data_path", help="Data path")
-parser.add_argument("gesture_ix", help="Gesture index", type=int)
+parser.add_argument("gesture_name", help="Gesture name")
 parser.add_argument("--ix", help="Annotation index", type=int, default=1)
 parser.add_argument("--time", help="Playback time", type=float, default=1)
 
 
 class App:
 
-    def __init__(self, data_path, gesture_ix, ix, playback_time):
-        self.items = list(annotated_gesture_managers(data_path)[gesture_ix].saved())
+    def __init__(self, data_path, gesture_name, ix, playback_time):
+        self.items = list(annotated_gesture_managers(data_path)[gesture_name].saved())
         self.ix = ix
         self.playback_time = playback_time
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     App(
         data_path=pathlib.Path(args.data_path),
-        gesture_ix=args.gesture_ix,
+        gesture_name=args.gesture_name,
         ix=args.ix - 1,
         playback_time=args.time,
     ).run()

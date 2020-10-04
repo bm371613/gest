@@ -12,7 +12,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("data_path", help="Data path")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--countdown", help="Countdown interval", type=int, default=3)
-parser.add_argument('--order', nargs='+', help='Auto mode order', type=int, default=())
+parser.add_argument('--order', nargs='+', help='Auto mode order',
+                    default=('pinch left', 'pinch right', 'background'))
 
 
 class App:
@@ -21,11 +22,11 @@ class App:
         self.camera = camera
         self.countdown = countdown
         self.annotated_gesture_managers = annotated_gesture_managers(data_path)
-        self.order = order or list(range(len(self.annotated_gesture_managers)))
+        self.order = order
 
         self.history = []
         self.order_ix = 0
-        self.gesture_ix = None
+        self.gesture_name = None
         self.auto = False
         self.capturing_session = None
         self.playback_session = None
@@ -52,6 +53,12 @@ class App:
 
     def handle_frame(self, at, frame):
         display = cv2.vconcat([
+            text(
+                np.zeros_like(frame)[:50],
+                f'{self.gesture_name}: {self.capturing_session.message(at)}'
+                if self.capturing_session
+                else 'ESC: quit; a: start/stop; d: delete',
+            ),
             self.capturing_session.process(at, frame) if self.capturing_session else cv2.flip(frame, 1),
             self.playback_session.render(at, frame.shape[:-1][::-1]) if self.playback_session else text(
                 np.zeros_like(frame),
@@ -61,13 +68,7 @@ class App:
         cv2.imshow('Capture and Label', display)
 
     def handle_key(self, at, key):
-        if ord('0') <= key < ord(str(len(self.annotated_gesture_managers))):
-            self.start_capturing(
-                at=at,
-                gesture_ix=key - ord('0'),
-                countdown=0,
-            )
-        elif key == ord('d'):
+        if key == ord('d'):
             if self.history:
                 self.history.pop(-1).remove()
                 self.playback_session = None
@@ -84,12 +85,12 @@ class App:
                 self.auto = True
                 self.start_capturing(at)
 
-    def start_capturing(self, at, gesture_ix=None, countdown=None):
-        if gesture_ix is None:
-            gesture_ix = self.order[self.order_ix % len(self.order)]
+    def start_capturing(self, at, gesture_name=None, countdown=None):
+        if gesture_name is None:
+            gesture_name = self.order[self.order_ix % len(self.order)]
             self.order_ix += 1
-        self.gesture_ix = gesture_ix
-        manager = self.annotated_gesture_managers[self.gesture_ix]
+        self.gesture_name = gesture_name
+        manager = self.annotated_gesture_managers[self.gesture_name]
         self.capturing_session = manager.start_capturing_session(
             at,
             countdown=self.countdown if countdown is None else countdown,
@@ -102,7 +103,7 @@ class App:
         if annotated is None:
             return
         self.history.append(
-            self.annotated_gesture_managers[self.gesture_ix].save(annotated)
+            self.annotated_gesture_managers[self.gesture_name].save(annotated)
         )
         self.playback_session = annotated.start_playback_session(at)
         if self.auto:

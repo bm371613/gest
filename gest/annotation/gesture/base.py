@@ -15,6 +15,9 @@ class AnnotatedGesture:
 
 class CapturingSession:
 
+    def message(self, at):
+        return ''
+
     def process(self, at, frame):
         raise NotImplementedError()
 
