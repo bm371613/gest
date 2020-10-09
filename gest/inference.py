@@ -18,7 +18,10 @@ class InferenceSession:
             cv2.resize(frame, (IMAGE_WIDTH, IMAGE_HEIGHT)),
             cv2.COLOR_BGR2RGB,
         ).transpose((2, 0, 1)).astype(np.float32) / 255.
-        x = x.reshape((1, *x.shape))
         x -= IMAGE_MEAN
         x /= IMAGE_STDDEV
-        return self.onnx_inference_session.run(['output'], {'input': x})[0][0][0]
+        heatmap, flipped_heatmap = self.onnx_inference_session.run(
+            ['output'],
+            {'input': np.stack((x, np.flip(x, -1)))},
+        )[0].squeeze(axis=1)
+        return np.stack((heatmap, np.flip(flipped_heatmap, -1)))

@@ -59,7 +59,7 @@ class App:
                 continue
 
             # inference
-            heatmap = self.inference_session.cv2_run(frame)
+            heatmap = self.inference_session.cv2_run(frame).max(axis=0)
 
             # scrolling state on/off
             score = heatmap.max()
@@ -89,6 +89,7 @@ class App:
                     self.scrolling_sensitivity * (root_relative_y - acc_relative_y)
                 ))
             cv2.imshow('Camera', text(cv2.flip(frame, 1), "Press ESC to quit"))
+            cv2.imshow('Heatmap', cv2.resize(heatmap[:,::-1], frame.shape[1::-1]))
             if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
                 break
             last_time = this_time

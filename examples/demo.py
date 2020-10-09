@@ -1,6 +1,7 @@
 import argparse
 
 import cv2
+import numpy as np
 
 from gest.cv_gui import text
 from gest.inference import InferenceSession
@@ -22,9 +23,12 @@ class App:
             ret, frame = capture.read()
             if not ret:
                 break
-            heatmap = self.inference_session.cv2_run(frame)
             cv2.imshow('Camera', text(cv2.flip(frame, 1), "Press ESC to quit"))
-            cv2.imshow('Heatmap', cv2.resize(heatmap[:,::-1], frame.shape[1::-1]))
+            left, right = self.inference_session.cv2_run(frame)
+            merged = np.zeros((*left.shape, 3))
+            merged[:, :, 2] = left  # red for left hand
+            merged[:, :, 1] = right  # green for right hand
+            cv2.imshow('Heatmap', cv2.flip(cv2.resize(merged, frame.shape[1::-1]), 1))
             if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
                 break
         capture.release()
