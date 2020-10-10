@@ -65,19 +65,13 @@ def draw_inferred_crossheads(frame, inference_result):
     if left.max() > .5:
         frame = crosshead(
             frame,
-            point=(
-                relative_average_coordinate(left, 1),
-                relative_average_coordinate(left, 0),
-            ),
+            point=relative_average_coordinate(left, (1, 0)),
             color=LEFT_COLOR,
         )
     if right.max() > .5:
         frame = crosshead(
             frame,
-            point=(
-                relative_average_coordinate(right, 1),
-                relative_average_coordinate(right, 0),
-            ),
+            point=relative_average_coordinate(right, (1, 0)),
             color=RIGHT_COLOR,
         )
     return frame
