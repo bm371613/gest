@@ -2,7 +2,6 @@ import argparse
 import time
 
 import cv2
-import numpy as np
 import pynput.mouse
 
 from gest.cv_gui import text, draw_inferred_crossheads, show_inference_result
@@ -14,13 +13,6 @@ parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--fps-limit", help="Frames per second limit", type=int)
 parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=20)
-
-
-def relative_average_y(heatmap, weight_exponent):
-    weights = heatmap.sum(axis=1) ** weight_exponent
-    y, step = np.linspace(0, 1, weights.shape[0], endpoint=False, retstep=True)
-    y += step / 2
-    return (y * weights).sum() / weights.sum()
 
 
 class App:

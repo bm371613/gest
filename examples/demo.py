@@ -1,7 +1,6 @@
 import argparse
 
 import cv2
-import numpy as np
 
 from gest.cv_gui import show_inference_result, text, draw_inferred_crossheads
 from gest.inference import InferenceSession
