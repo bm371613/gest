@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--fps-limit", help="Frames per second limit", type=int)
-parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=15)
+parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=10)
 
 
 def relative_average_y(heatmap, weight_exponent):
@@ -63,8 +63,8 @@ class App:
 
             # scrolling state on/off
             score = heatmap.max()
-            acc_score = accumulate(acc_score, score, accumulated_weight=3)
-            if on and acc_score < .2:
+            acc_score = accumulate(acc_score, score, accumulated_weight=2)
+            if on and acc_score < .3:
                 on = False
                 acc_relative_y = None
                 root_relative_y = None
@@ -73,12 +73,12 @@ class App:
 
             if on:
                 # update current y-position selection
-                if score > .2:
+                if score > .3:
                     relative_y = relative_average_y(heatmap, weight_exponent=4)
                     if root_relative_y is None:
                         root_relative_y = relative_y
                     acc_relative_y = accumulate(acc_relative_y, relative_y,
-                                                accumulated_weight=3)
+                                                accumulated_weight=1)
 
                 # draw root and current y selection
                 frame[int(root_relative_y * frame.shape[0]), :] = [0, 255, 0]
