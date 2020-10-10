@@ -1,39 +1,8 @@
 import random
 
-import cv2
-
-from gest.cv_gui import text
+from gest.cv_gui import text, crosshead
 
 from . import static
-
-
-def horizontal_line(frame, y: int):
-    height, width, *_ = frame.shape
-    return cv2.line(
-        frame,
-        (0, y),
-        (width, y),
-        (0, 0, 255),
-        1,
-    )
-
-
-def vertical_line(frame, x: int):
-    height, width, *_ = frame.shape
-    return cv2.line(
-        frame,
-        (x, 0),
-        (x, height),
-        (0, 0, 255),
-        1,
-    )
-
-
-def crosshead(frame, point):
-    height, width, *_ = frame.shape
-    frame = vertical_line(frame, int(point[0] * width))
-    frame = horizontal_line(frame, int(point[1] * height))
-    return frame
 
 
 class AnnotatedGesture(static.AnnotatedGesture):

@@ -2,31 +2,17 @@ import argparse
 import time
 
 import cv2
-import numpy as np
 import pynput.mouse
 
 from gest.cv_gui import text
 from gest.inference import InferenceSession
-
+from gest.math import relative_average_coordinate, accumulate
 
 parser = argparse.ArgumentParser()
 parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--fps-limit", help="Frames per second limit", type=int)
 parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=10)
-
-
-def relative_average_y(heatmap, weight_exponent):
-    weights = heatmap.sum(axis=1) ** weight_exponent
-    y, step = np.linspace(0, 1, weights.shape[0], endpoint=False, retstep=True)
-    y += step / 2
-    return (y * weights).sum() / weights.sum()
-
-
-def accumulate(accumulated, current, accumulated_weight):
-    if accumulated is None:
-        return current
-    return (accumulated * accumulated_weight + current) / (accumulated_weight + 1)
 
 
 class App:
@@ -74,7 +60,7 @@ class App:
             if on:
                 # update current y-position selection
                 if score > .3:
-                    relative_y = relative_average_y(heatmap, weight_exponent=4)
+                    relative_y = relative_average_coordinate(heatmap, 0)
                     if root_relative_y is None:
                         root_relative_y = relative_y
                     acc_relative_y = accumulate(acc_relative_y, relative_y,
