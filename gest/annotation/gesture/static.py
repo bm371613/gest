@@ -27,12 +27,13 @@ class AnnotatedGesture(base.AnnotatedGesture, base.PlaybackSession):
 
 
 class CapturingSession(base.CapturingSession):
-    ANNOTATED_GESTURE_CLASS = AnnotatedGesture
 
-    def __init__(self, started_at, countdown, annotations=()):
+    def __init__(self, started_at, countdown, annotations=(),
+                 annotated_gesture_class=AnnotatedGesture):
         self.started_at = started_at
         self.countdown = countdown
         self.annotations = annotations
+        self.annotated_gesture_class = annotated_gesture_class
         self._result = None
 
     def message(self, at):
@@ -47,7 +48,7 @@ class CapturingSession(base.CapturingSession):
         elif at - self.started_at < self.countdown:
             return self.draw_annotations(filipped_frame=cv2.flip(frame, 1))
         else:
-            self._result = self.ANNOTATED_GESTURE_CLASS(name=str(int(at)), frame=frame, annotations=self.annotations)
+            self._result = self.annotated_gesture_class(name=str(int(at)), frame=frame, annotations=self.annotations)
             return cv2.flip(frame, 1)
 
     def result(self) -> typing.Optional[AnnotatedGesture]:
@@ -56,10 +57,9 @@ class CapturingSession(base.CapturingSession):
 
 class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
 
-    ANNOTATED_GESTURE_CLASS = AnnotatedGesture
-
-    def __init__(self, path):
+    def __init__(self, path, annotated_gesture_class=AnnotatedGesture):
         self.path = path
+        self.annotated_gesture_class = annotated_gesture_class
 
     @property
     def annotations_path(self):
@@ -74,7 +74,7 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
         return result
 
     def load(self) -> AnnotatedGesture:
-        return self.ANNOTATED_GESTURE_CLASS(
+        return self.annotated_gesture_class(
             name=self.path.stem,
             frame=cv2.imread(str(self.path)),
             annotations=(
@@ -90,26 +90,32 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
 
 
 class AnnotatedGestureManager(base.AnnotatedGestureManager):
-    CAPTURING_SESSION_CLASS = CapturingSession
-    SAVED_ANNOTATED_GESTURE_CLASS = SavedAnnotatedGesture
 
-    def __init__(self, data_path):
+    def __init__(self, data_path, capturing_session_class=CapturingSession,
+                 annotated_gesture_class=AnnotatedGesture,
+                 saved_annotated_gesture_class=SavedAnnotatedGesture):
         self.data_path = data_path
+        self.capturing_session_class = capturing_session_class
+        self.annotated_gesture_class = annotated_gesture_class
+        self.saved_annotated_gesture_class = saved_annotated_gesture_class
 
     def generate_annotations(self):
         return ()
 
     def start_capturing_session(self, at, *, countdown=0) -> CapturingSession:
-        return self.CAPTURING_SESSION_CLASS(
+        return self.capturing_session_class(
             started_at=at,
             countdown=countdown,
             annotations=self.generate_annotations(),
+            annotated_gesture_class=self.annotated_gesture_class,
         )
 
     def save(self, annotated_gesture: AnnotatedGesture) -> SavedAnnotatedGesture:
         path = self.data_path / f'{annotated_gesture.name}.jpg'
-        return self.SAVED_ANNOTATED_GESTURE_CLASS.save(annotated_gesture, path)
+        return self.saved_annotated_gesture_class.save(annotated_gesture, path)
 
     def saved(self) -> typing.Iterable[SavedAnnotatedGesture]:
         for path in sorted(self.data_path.glob('*.jpg')):
-            yield self.SAVED_ANNOTATED_GESTURE_CLASS(path)
+            yield self.saved_annotated_gesture_class(
+                path, annotated_gesture_class=self.annotated_gesture_class,
+            )

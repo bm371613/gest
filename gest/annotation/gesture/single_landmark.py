@@ -16,7 +16,6 @@ class AnnotatedGesture(static.AnnotatedGesture):
 
 
 class CapturingSession(static.CapturingSession):
-    ANNOTATED_GESTURE_CLASS = AnnotatedGesture
 
     def draw_annotations(self, filipped_frame):
         frame = filipped_frame
@@ -28,16 +27,14 @@ class CapturingSession(static.CapturingSession):
         return frame
 
 
-class SavedAnnotatedGesture(static.SavedAnnotatedGesture):
-    ANNOTATED_GESTURE_CLASS = AnnotatedGesture
-
-
 class AnnotatedGestureManager(static.AnnotatedGestureManager):
-    CAPTURING_SESSION_CLASS = CapturingSession
-    SAVED_ANNOTATED_GESTURE_CLASS = SavedAnnotatedGesture
 
     def __init__(self, data_path, hand=None):
-        super().__init__(data_path)
+        super().__init__(
+            data_path,
+            annotated_gesture_class=AnnotatedGesture,
+            capturing_session_class=CapturingSession,
+        )
         self.hand = hand
 
     def generate_annotations(self):
