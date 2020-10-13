@@ -31,6 +31,7 @@ class App:
         capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         button_down = None
+        button_down_since = None
         scroll_acc = 0
         scroll_distance = 0
         last_time = None
@@ -64,23 +65,27 @@ class App:
             if left.max() < self.score_threshold or right.max() < self.score_threshold:
                 pass
             elif left_x < right_x:
-                pass  # TODO another gesture slot (crossed hands)
+                button_down_now = 'double click'
             elif abs(left_y - right_y) < .05:
                 if left_x - right_x < .1:
-                    button_down_now = 'mouse'
-            else:
+                    button_down_now = 'click'
+                else:
+                    button_down_now = 'right click'
+            elif abs(left_y - right_y) > .1:
                 scroll_now = right_y - left_y
             if button_down != button_down_now:
-                # release previously pressed
-                if button_down == 'mouse':
-                    pass
-            button_down = None
-            if button_down_now is not None:
-                # press buttons
-                if button_down_now == 'mouse' and last_click is None or this_time - last_click > .5:
+                button_down_since = this_time
+                if button_down_now == 'click' and (last_click is None or this_time - last_click > .5):
                     self.mouse.click(pynput.mouse.Button.left)
-                    button_down = button_down_now
                     last_click = this_time
+                if button_down_now == 'double click' and (last_click is None or this_time - last_click > .5):
+                    self.mouse.click(pynput.mouse.Button.left, 2)
+                    last_click = this_time
+                button_down = button_down_now
+            elif button_down_now == 'right click' and .5 < this_time - button_down_since and \
+                    (last_click is None or last_click < button_down_since):
+                self.mouse.click(pynput.mouse.Button.right)
+                last_click = this_time
             scroll_acc = accumulate(scroll_acc, scroll_now)
 
             frame = draw_inferred_crossheads(frame, inference_result)
