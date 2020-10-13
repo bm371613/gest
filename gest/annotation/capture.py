@@ -13,7 +13,7 @@ parser.add_argument("data_path", help="Data path")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--countdown", help="Countdown interval", type=int, default=3)
 parser.add_argument('--order', nargs='+', help='Auto mode order',
-                    default=('pinch left', 'pinch right', 'background'))
+                    default=('pinch_left', 'pinch_right', 'background'))
 
 
 class App:
