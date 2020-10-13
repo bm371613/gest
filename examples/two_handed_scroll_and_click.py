@@ -11,18 +11,16 @@ from gest.math import relative_average_coordinate, accumulate
 parser = argparse.ArgumentParser()
 parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
-parser.add_argument("--fps-limit", help="Frames per second limit", type=int)
 parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=20)
 
 
 class App:
 
-    def __init__(self, camera, model_file, fps_limit, scrolling_sensitivity):
+    def __init__(self, camera, model_file, scrolling_sensitivity):
         self.camera = camera
         self.inference_session = InferenceSession(model_file)
         self.mouse = pynput.mouse.Controller()
 
-        self.fps_limit = fps_limit
         self.scrolling_sensitivity = scrolling_sensitivity
         self.score_threshold = .5
 
@@ -41,16 +39,6 @@ class App:
             if not ret:
                 break
             this_time = time.time()
-
-            # scrolling before fps limiting for smooth motion
-            if last_time:
-                scroll_distance += scroll_acc * (last_time - this_time) * self.scrolling_sensitivity
-                self.mouse.scroll(0, int(scroll_distance))
-                scroll_distance -= int(scroll_distance)
-
-            # fps limiting
-            if self.fps_limit and last_time and (this_time - last_time) * self.fps_limit < 1:
-                continue
 
             # inference
             inference_result = self.inference_session.cv2_run(frame)
@@ -86,7 +74,12 @@ class App:
                     (last_click is None or last_click < button_down_since):
                 self.mouse.click(pynput.mouse.Button.right)
                 last_click = this_time
+
             scroll_acc = accumulate(scroll_acc, scroll_now)
+            if last_time:
+                scroll_distance += scroll_acc * (last_time - this_time) * self.scrolling_sensitivity
+                self.mouse.scroll(0, int(scroll_distance))
+                scroll_distance -= int(scroll_distance)
 
             frame = draw_inferred_crossheads(frame, inference_result)
             cv2.imshow('Camera', text(cv2.flip(frame, 1), "Press ESC to quit"))
@@ -105,6 +98,5 @@ if __name__ == "__main__":
     App(
         camera=args.camera,
         model_file=args.model_file,
-        fps_limit=args.fps_limit,
         scrolling_sensitivity=args.sensitivity,
     ).run()
