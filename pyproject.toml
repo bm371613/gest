@@ -11,15 +11,10 @@ numpy = "*"
 onnxruntime = "^1.4.0"
 opencv-python = "^4.4.0"
 
-[tool.poetry.dev-dependencies]
-jupyter = "*"
-neptune-notebooks = "*"
-pytorch-lightning = "*"
-psutil = "*"
-torch = "*"
-torchvision = "*"
+pynput = { version = "*", optional = true }
 
-pynput = "*"
+[tool.poetry.extras]
+examples = ["pynput"]
 
 [build-system]
 requires = ["poetry>=0.12"]

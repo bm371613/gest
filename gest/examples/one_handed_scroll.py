@@ -1,9 +1,11 @@
 import argparse
+import threading
+import time
 
 import cv2
 import pynput.mouse
 
-from gest.cv_gui import text
+from gest.cv_gui import text, show_inference_result
 from gest.inference import InferenceSession
 from gest.math import relative_average_coordinate, accumulate
 
@@ -21,8 +23,24 @@ class App:
         self.mouse = pynput.mouse.Controller()
 
         self.scrolling_sensitivity = scrolling_sensitivity
+        self.scrolling_speed = 0
+
+    def scroll_forever(self):
+        last_time = time.time()
+        distance = 0
+        while True:
+            time.sleep(0.1)
+            now = time.time()
+            distance += (now - last_time) * self.scrolling_speed * self.scrolling_sensitivity
+            self.mouse.scroll(0, int(distance))
+            distance -= int(distance)
+            last_time = now
 
     def run(self):
+        scrolling_thread = threading.Thread(target=self.scroll_forever)
+        scrolling_thread.daemon = True
+        scrolling_thread.start()
+
         capture = cv2.VideoCapture(self.camera)
         capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
@@ -35,7 +53,8 @@ class App:
             if not ret:
                 break
 
-            heatmap = self.inference_session.cv2_run(frame).max(axis=0)
+            inference_result = self.inference_session.cv2_run(frame)
+            heatmap = inference_result.max(0)
 
             # scrolling state on/off
             score = heatmap.max()
@@ -47,25 +66,23 @@ class App:
             if not on and acc_score > .5:
                 on = True
 
+            scroll_now = 0
             if on:
                 # update current y-position selection
                 if score > .3:
                     relative_y = relative_average_coordinate(heatmap, 0)
                     if root_relative_y is None:
                         root_relative_y = relative_y
-                    acc_relative_y = accumulate(acc_relative_y, relative_y,
-                                                accumulated_weight=1)
+                    acc_relative_y = accumulate(acc_relative_y, relative_y)
+                    scroll_now = root_relative_y - acc_relative_y
 
                 # draw root and current y selection
                 frame[int(root_relative_y * frame.shape[0]), :] = [0, 255, 0]
                 frame[int(acc_relative_y * frame.shape[0]), :] = [0, 0, 255]
+            self.scrolling_speed = scroll_now
 
-                # scroll
-                self.mouse.scroll(0, int(
-                    self.scrolling_sensitivity * (root_relative_y - acc_relative_y)
-                ))
+            show_inference_result(frame, inference_result)
             cv2.imshow('Camera', text(cv2.flip(frame, 1), "Press ESC to quit"))
-            cv2.imshow('Heatmap', cv2.resize(heatmap[:,::-1], frame.shape[1::-1]))
             if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
                 break
 
