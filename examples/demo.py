@@ -1,9 +1,11 @@
 import argparse
+import time
 
 import cv2
 
 from gest.cv_gui import show_inference_result, text, draw_inferred_crossheads
 from gest.inference import InferenceSession
+from gest.math import accumulate
 
 parser = argparse.ArgumentParser()
 parser.add_argument("model_file", help="Model file")
@@ -18,14 +20,21 @@ class App:
 
     def run(self):
         capture = cv2.VideoCapture(self.camera)
+        last_time = time.time()
+        fps = None
         while True:
             ret, frame = capture.read()
             if not ret:
                 break
             result = self.inference_session.cv2_run(frame)
+
+            now = time.time()
+            fps = accumulate(fps, 1 / (now - last_time))
+            last_time = now
+
             frame = draw_inferred_crossheads(frame, result)
-            cv2.imshow('Camera', text(cv2.flip(frame, 1), "Press ESC to quit"))
             show_inference_result(frame, result)
+            cv2.imshow('Camera', text(cv2.flip(frame, 1), f"{fps:.1f} fps | Press ESC to quit"))
             if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
                 break
         capture.release()
