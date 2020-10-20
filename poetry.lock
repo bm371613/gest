@@ -3,7 +3,7 @@ name = "evdev"
 version = "1.3.0"
 description = "Bindings to the Linux input handling subsystem"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [[package]]
@@ -53,7 +53,7 @@ name = "pynput"
 version = "1.7.1"
 description = "Monitor and control user input devices"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [package.dependencies]
@@ -67,7 +67,7 @@ name = "pyobjc-core"
 version = "6.2.2"
 description = "Python<->ObjC Interoperability Module"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [[package]]
@@ -75,7 +75,7 @@ name = "pyobjc-framework-cocoa"
 version = "6.2.2"
 description = "Wrappers for the Cocoa frameworks on macOS"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -86,7 +86,7 @@ name = "pyobjc-framework-quartz"
 version = "6.2.2"
 description = "Wrappers for the Quartz frameworks on macOS"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -98,7 +98,7 @@ name = "python-xlib"
 version = "0.28"
 description = "Python X Library"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [package.dependencies]
@@ -112,13 +112,10 @@ category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
-[extras]
-examples = ["pynput"]
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "d5d023fad78910b698ae64aab07374f295ccb1199ed5043fe3ae37f42d4908ae"
+content-hash = "ea9a8aabdfe0b7bfeae58f88baf362862c1f4889c6c1fd4f649cc157898c84f1"
 
 [metadata.files]
 evdev = [

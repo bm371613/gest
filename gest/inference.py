@@ -1,7 +1,10 @@
+import pathlib
+
 import cv2
 import numpy as np
 import onnxruntime
 
+DEFAULT_MODEL_FILE = pathlib.Path(__file__).parent / 'GES-120.onnx'
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 IMAGE_MEAN = np.asarray([0.485, 0.456, 0.406])[:, None, None]
@@ -10,8 +13,8 @@ IMAGE_STDDEV = np.asarray([0.229, 0.224, 0.225])[:, None, None]
 
 class InferenceSession:
 
-    def __init__(self, model_file):
-        self.onnx_inference_session = onnxruntime.InferenceSession(model_file)
+    def __init__(self, model_file=None):
+        self.onnx_inference_session = onnxruntime.InferenceSession(str(model_file or DEFAULT_MODEL_FILE))
 
     def cv2_run(self, frame):
         x = cv2.cvtColor(

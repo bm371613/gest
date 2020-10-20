@@ -10,8 +10,8 @@ from gest.inference import InferenceSession
 from gest.math import relative_average_coordinate
 
 parser = argparse.ArgumentParser()
-parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
+parser.add_argument("--model", help="Model file")
 parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=20)
 
 
@@ -43,8 +43,8 @@ class App:
         scrolling_thread.start()
 
         capture = cv2.VideoCapture(self.camera)
-        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         button_down = None
         button_down_since = None
         last_click = None
@@ -107,6 +107,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     App(
         camera=args.camera,
-        model_file=args.model_file,
+        model_file=args.model,
         scrolling_sensitivity=args.sensitivity,
     ).run()

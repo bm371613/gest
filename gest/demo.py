@@ -8,8 +8,8 @@ from gest.inference import InferenceSession
 from gest.math import accumulate
 
 parser = argparse.ArgumentParser()
-parser.add_argument("model_file", help="Model file")
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
+parser.add_argument("--model", help="Model file")
 
 
 class App:
@@ -20,6 +20,8 @@ class App:
 
     def run(self):
         capture = cv2.VideoCapture(self.camera)
+        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         last_time = time.time()
         fps = None
         while True:
@@ -45,5 +47,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     App(
         camera=args.camera,
-        model_file=args.model_file,
+        model_file=args.model,
     ).run()

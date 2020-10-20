@@ -21,8 +21,10 @@ class App:
     def __init__(self, camera, data_path, countdown, order):
         self.camera = camera
         self.countdown = countdown
-        self.annotated_gesture_managers = annotated_gesture_managers(data_path)
+        self.data_path = data_path
         self.order = order
+
+        self.annotated_gesture_managers = annotated_gesture_managers(data_path)
 
         self.history = []
         self.order_ix = 0
@@ -32,9 +34,12 @@ class App:
         self.playback_session = None
 
     def run(self):
-        video_capture = cv2.VideoCapture(self.camera)
+        self.data_path.mkdir(parents=True, exist_ok=True)
+        capture = cv2.VideoCapture(self.camera)
+        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         while True:
-            ret, frame = video_capture.read()
+            ret, frame = capture.read()
             if not ret:
                 break
             now = time.time()
@@ -48,7 +53,7 @@ class App:
 
             self.finalize_capturing_maybe(now)
 
-        video_capture.release()
+        capture.release()
         cv2.destroyAllWindows()
 
     def handle_frame(self, at, frame):
