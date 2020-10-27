@@ -1,10 +1,9 @@
 import argparse
-import time
 
 import cv2
 
 from gest.cv_gui import show_inference_result, text, draw_inferred_crossheads
-from gest.inference import InferenceSession
+from gest.inference import CvCameraInferencePipeline
 from gest.math import accumulate
 
 parser = argparse.ArgumentParser()
@@ -15,31 +14,25 @@ parser.add_argument("--model", help="Model file")
 class App:
 
     def __init__(self, camera, model_file):
-        self.camera = camera
-        self.inference_session = InferenceSession(model_file)
+        self.pipeline = CvCameraInferencePipeline(camera, model_file)
 
     def run(self):
-        capture = cv2.VideoCapture(self.camera)
-        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        last_time = time.time()
         fps = None
-        while True:
-            ret, frame = capture.read()
-            if not ret:
-                break
-            result = self.inference_session.cv2_run(frame)
-
-            now = time.time()
-            fps = accumulate(fps, 1 / (now - last_time))
-            last_time = now
-
-            frame = draw_inferred_crossheads(frame, result)
-            show_inference_result(frame, result)
-            cv2.imshow('Camera', text(cv2.flip(frame, 1), f"{fps:.1f} fps | Press ESC to quit"))
-            if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
-                break
-        capture.release()
+        latency = None
+        with self.pipeline() as stream:
+            for item in stream:
+                fps = accumulate(fps, item.fps)
+                latency = accumulate(latency, item.latency)
+                frame = item.frame
+                frame = draw_inferred_crossheads(frame, item.inference_result)
+                frame = cv2.flip(frame, 1)
+                frame = text(frame, f"fps {fps: 2.0f}", point=(0, .5))
+                frame = text(frame, f"latency {latency:.2f}s", point=(0, .75))
+                frame = text(frame, "Press ESC to quit")
+                cv2.imshow('Camera', frame)
+                show_inference_result(frame, item.inference_result)
+                if cv2.waitKey(1) & 0xFF == 27:  # esc to quit
+                    break
         cv2.destroyAllWindows()
 
 
