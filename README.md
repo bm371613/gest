@@ -70,6 +70,12 @@ For everyday use, you don't want to dedicate too much resources to gesture recog
 
 Try different values to find balance between responsiveness and CPU load.
 
+## Custom scripts
+
+The demo and example scripts serve two additional purposes:
+they can be used as templates for custom scripts
+and they define the public API for the purpose of semantic versioning.
+
 ## Training data annotation
 
 ### Capturing
