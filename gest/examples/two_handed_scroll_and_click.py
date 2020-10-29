@@ -12,7 +12,7 @@ from gest.math import relative_average_coordinate
 parser = argparse.ArgumentParser()
 parser.add_argument("--camera", help="Camera index", type=int, default=0)
 parser.add_argument("--model", help="Model file")
-parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=20)
+parser.add_argument("--sensitivity", help="Scrolling sensitivity", type=int, default=50)
 
 
 class App:
@@ -29,7 +29,7 @@ class App:
         last_time = time.time()
         distance = 0
         while True:
-            time.sleep(0.1)
+            time.sleep(0.01)
             now = time.time()
             distance += (now - last_time) * self.scrolling_speed * self.scrolling_sensitivity
             self.mouse.scroll(0, int(distance))
@@ -65,7 +65,7 @@ class App:
                         button_down_now = 'click'
                     else:
                         button_down_now = 'right click'
-                elif abs(left_y - right_y) > .1:
+                elif abs(left_y - right_y) > .08:
                     scroll_now = left_y - right_y
 
                 if button_down != button_down_now:
