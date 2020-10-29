@@ -19,7 +19,7 @@ class App:
     def run(self):
         fps = None
         latency = None
-        with self.pipeline() as stream:
+        with self.pipeline.threaded() as stream:
             for item in stream:
                 fps = accumulate(fps, item.fps)
                 latency = accumulate(latency, item.latency)

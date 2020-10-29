@@ -43,7 +43,7 @@ class App:
         button_down = None
         button_down_since = None
         last_click = None
-        with self.pipeline() as stream:
+        with self.pipeline.threaded() as stream:
             for item in stream:
                 now = item.captured_at
                 frame = item.frame
