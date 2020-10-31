@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gest"
-version = "0.1.0"
+version = "0.2.0"
 description = "Hand gestures as an input device"
 authors = ["Bartosz Marcinkowski <b.marcinkowski@leomail.pl>"]
 readme = "README.md"
