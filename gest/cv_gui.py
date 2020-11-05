@@ -42,10 +42,10 @@ def vertical_line(frame, x: int, color=(0, 0, 255)):
     )
 
 
-def crosshead(frame, point, color=(0, 0, 255)):
+def crosshead(frame, x, y, color=(0, 0, 255)):
     height, width, *_ = frame.shape
-    frame = vertical_line(frame, int(point[0] * width), color)
-    frame = horizontal_line(frame, int(point[1] * height), color)
+    frame = vertical_line(frame, int(x * width), color)
+    frame = horizontal_line(frame, int(y * height), color)
     return frame
 
 
@@ -65,13 +65,13 @@ def draw_inferred_crossheads(frame, inference_result):
     if left.max() > .5:
         frame = crosshead(
             frame,
-            point=relative_average_coordinate(left, (1, 0)),
+            *relative_average_coordinate(left, (1, 0)),
             color=LEFT_COLOR,
         )
     if right.max() > .5:
         frame = crosshead(
             frame,
-            point=relative_average_coordinate(right, (1, 0)),
+            *relative_average_coordinate(right, (1, 0)),
             color=RIGHT_COLOR,
         )
     return frame

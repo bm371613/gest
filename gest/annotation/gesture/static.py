@@ -66,8 +66,8 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
         return self.path.with_suffix('.json')
 
     @classmethod
-    def save(cls, annotated_gesture, path):
-        result = cls(path=path)
+    def save(cls, annotated_gesture, path, annotated_gesture_class):
+        result = cls(path=path, annotated_gesture_class=annotated_gesture_class)
         path.parent.mkdir(parents=True, exist_ok=True)
         cv2.imwrite(str(path), annotated_gesture.frame)
         json.dump(annotated_gesture.annotations, result.annotations_path.open('w'))
@@ -112,7 +112,9 @@ class AnnotatedGestureManager(base.AnnotatedGestureManager):
 
     def save(self, annotated_gesture: AnnotatedGesture) -> SavedAnnotatedGesture:
         path = self.data_path / f'{annotated_gesture.name}.jpg'
-        return self.saved_annotated_gesture_class.save(annotated_gesture, path)
+        return self.saved_annotated_gesture_class.save(
+            annotated_gesture, path, self.annotated_gesture_class,
+        )
 
     def saved(self) -> typing.Iterable[SavedAnnotatedGesture]:
         for path in sorted(self.data_path.glob('*.jpg')):

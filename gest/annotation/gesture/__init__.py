@@ -1,14 +1,19 @@
 from . import (
     static,
-    single_landmark,
+    closed_pinch,
+    open_pinch,
 )
 
 
 def annotated_gesture_managers(data_path):
     return {
         "background": static.AnnotatedGestureManager(data_path / 'background'),
-        "pinch_left": single_landmark.AnnotatedGestureManager(
-            data_path / 'pinch_left', hand="left"),
-        "pinch_right": single_landmark.AnnotatedGestureManager(
-            data_path / 'pinch_right', hand="right"),
+        "closed_pinch_left": closed_pinch.AnnotatedGestureManager(
+            data_path / 'closed_pinch_left', hand="left"),
+        "closed_pinch_right": closed_pinch.AnnotatedGestureManager(
+            data_path / 'closed_pinch_right', hand="right"),
+        "open_pinch_left": open_pinch.AnnotatedGestureManager(
+            data_path / 'open_pinch_left', hand="left"),
+        "open_pinch_right": open_pinch.AnnotatedGestureManager(
+            data_path / 'open_pinch_right', hand="right"),
     }

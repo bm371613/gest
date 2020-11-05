@@ -91,11 +91,11 @@ You will also see the last annotated image for quick review. It can be deleted w
 
 ### Reviewing
 
-`python -m gest.annotation.review --time 1 data_directory pinch_left`
+`python -m gest.annotation.review --time 1 data_directory closed_pinch_left`
 
 will let you review all images annotated as left hand pinch in `data_directory`, showing you each for 1 second if you start/stop automatic advancing with `a`. Otherwise you can go to the next/previous image with `n`/`p`. Delete incorrectly annotated images with `d`.
 
-You should also review `right_pinch` and `background`.
+You should also review `closed_pinch_right` and `background`.
 
 ### Annotation guidelines
 It makes sense to annotate realistic training data that the model performs poorly on, like if
