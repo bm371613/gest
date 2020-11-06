@@ -44,7 +44,7 @@ class AnnotatedGestureManager(static.AnnotatedGestureManager):
 
     def generate_annotations(self):
         x = random.random() * 0.8 + .1
-        y_span = random.random() * 0.05 + 0.05
+        y_span = random.random() * 0.05 + 0.025
         y_center = random.random() * (0.8 - y_span) + .1 + y_span / 2
         return (
             {

@@ -63,7 +63,7 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
 
     @property
     def annotations_path(self):
-        return self.path.with_suffix('.json')
+        return self.path.with_suffix(self.path.suffix + '.json')
 
     @classmethod
     def save(cls, annotated_gesture, path, annotated_gesture_class):
