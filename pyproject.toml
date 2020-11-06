@@ -6,7 +6,7 @@ authors = ["Bartosz Marcinkowski <b.marcinkowski@leomail.pl>"]
 readme = "README.md"
 repository = "https://github.com/bm371613/gest/"
 license = "GPL-3.0"
-include = ["CHANGELOG.md", "gest/GES-130.onnx"]
+include = ["CHANGELOG.md", "gest/GES-131.onnx"]
 
 [tool.poetry.dependencies]
 python = "^3.6.1"

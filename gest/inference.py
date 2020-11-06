@@ -7,7 +7,7 @@ import onnxruntime
 
 from gest.pipeline import Pipeline, Factory
 
-DEFAULT_MODEL_FILE = pathlib.Path(__file__).parent / 'GES-130.onnx'
+DEFAULT_MODEL_FILE = pathlib.Path(__file__).parent / 'GES-131.onnx'
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 IMAGE_MEAN = np.asarray([0.485, 0.456, 0.406])[:, None, None]
