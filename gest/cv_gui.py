@@ -3,10 +3,9 @@ import numpy as np
 
 from gest.math import relative_average_coordinate
 
-LEFT_COLOR = (0, 0, 255)
-RIGHT_COLOR = (0, 255, 0)
-LEFT_COLOR_IX = 2
-RIGHT_COLOR_IX = 1
+LEFT_COLOR = (0., 0., 1.)
+RIGHT_COLOR = (0., 1., 0.)
+OPEN_COLOR = (1., 0., 0.)
 
 
 def text(frame, text, scale=1, thickness=1, font=cv2.FONT_HERSHEY_SIMPLEX, point=(0, 1),
@@ -50,28 +49,41 @@ def crosshead(frame, x, y, color=(0, 0, 255)):
 
 
 def show_inference_result(frame, inference_result):
-    left, right = inference_result
+    (left, open_left), (right, open_right) = inference_result
     display = np.zeros((*left.shape, 3))
-    display[:, :, LEFT_COLOR_IX] = left  # red for left hand
-    display[:, :, RIGHT_COLOR_IX] = right  # green for right hand
+    np.maximum(display, np.tensordot(left, LEFT_COLOR, axes=0), out=display)
+    np.maximum(display, np.tensordot(right, RIGHT_COLOR, axes=0), out=display)
+    np.maximum(display, np.tensordot(np.maximum(open_left * left, open_right * right), OPEN_COLOR, axes=0), out=display)
     display = cv2.flip(cv2.resize(display, frame.shape[1::-1]), 1)
-    display = text(display, f'Left: {left.max():.0%}', fg=LEFT_COLOR)
-    display = text(display, f'Right: {right.max():.0%}', fg=RIGHT_COLOR, point=(.5, 1))
+    display = text(display, f'Left: {left.max():.0%}', point=(0, 1))
+    if left.max() > .5:
+        color = np.maximum(LEFT_COLOR, np.multiply(OPEN_COLOR, open_left[left > .5].mean()))
+        display = text(display, f'Open: {open_left[left > .5].mean():.0%}', fg=color, point=(0, .8))
+    display = text(display, f'Right: {right.max():.0%}', point=(.5, 1))
+    if right.max() > .5:
+        color = np.maximum(RIGHT_COLOR, np.multiply(OPEN_COLOR, open_right[right > .5].mean()))
+        display = text(display, f'Open: {open_right[right > .5].mean():.0%}', fg=color, point=(0.5, .8))
     cv2.imshow('Heatmap', display)
 
 
 def draw_inferred_crossheads(frame, inference_result):
-    left, right = inference_result
+    (left, open_left), (right, open_right) = inference_result
     if left.max() > .5:
         frame = crosshead(
             frame,
             *relative_average_coordinate(left, (1, 0)),
-            color=LEFT_COLOR,
+            color=np.maximum(
+                LEFT_COLOR,
+                np.multiply(OPEN_COLOR, open_left[left > .5].mean()),
+            ) * 255,
         )
     if right.max() > .5:
         frame = crosshead(
             frame,
             *relative_average_coordinate(right, (1, 0)),
-            color=RIGHT_COLOR,
+            color=np.maximum(
+                RIGHT_COLOR,
+                np.multiply(OPEN_COLOR, open_right[right > .5].mean()),
+            ) * 255,
         )
     return frame

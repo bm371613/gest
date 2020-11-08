@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- closed/open pinch classification
+
 ## [0.3.0] - 2020-11-06
 ### Added
 - open pinch annotation implemented

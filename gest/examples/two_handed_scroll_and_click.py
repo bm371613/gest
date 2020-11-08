@@ -48,7 +48,7 @@ class App:
                 now = item.captured_at
                 frame = item.frame
                 inference_result = item.inference_result
-                left, right = inference_result
+                (left, open_left), (right, open_right) = inference_result
 
                 # actions
                 left_x, left_y = relative_average_coordinate(left, (1, 0))
@@ -57,6 +57,10 @@ class App:
                 scroll_now = 0
 
                 if left.max() < self.score_threshold or right.max() < self.score_threshold:
+                    pass
+                elif open_left[left > .5].mean() > .5 and open_right[right > .5].mean() > .5:
+                    button_down_now = 'drag'
+                elif open_left[left > .5].mean() > .5 or open_right[right > .5].mean() > .5:
                     pass
                 elif left_x < right_x:
                     button_down_now = 'double click'
@@ -70,6 +74,11 @@ class App:
 
                 if button_down != button_down_now:
                     button_down_since = now
+                    if button_down == 'drag':
+                        self.mouse.release(pynput.mouse.Button.left)
+                    if button_down_now == 'drag' and (last_click is None or now - last_click > .5):
+                        self.mouse.press(pynput.mouse.Button.left)
+                        last_click = now
                     if button_down_now == 'click' and (last_click is None or now - last_click > .5):
                         self.mouse.click(pynput.mouse.Button.left)
                         last_click = now

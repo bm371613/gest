@@ -7,7 +7,7 @@ import onnxruntime
 
 from gest.pipeline import Pipeline, Factory
 
-DEFAULT_MODEL_FILE = pathlib.Path(__file__).parent / 'GES-131.onnx'
+DEFAULT_MODEL_FILE = pathlib.Path(__file__).parent / 'GES-147.onnx'
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 IMAGE_MEAN = np.asarray([0.485, 0.456, 0.406])[:, None, None]
@@ -34,8 +34,8 @@ class InferenceSession:
 
     @staticmethod
     def postprocess(output):
-        heatmap, flipped_heatmap = output[0].squeeze(axis=1)
-        return np.stack((heatmap, np.flip(flipped_heatmap, -1)))
+        left, flipped_right = output[0]
+        return np.stack((left, np.flip(flipped_right, -1)))
 
     def cv2_run(self, frame):
         input = self.cv2_preprocess(frame)
