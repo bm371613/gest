@@ -2,6 +2,7 @@ from . import (
     static,
     closed_pinch,
     open_pinch,
+    video,
 )
 
 
@@ -16,4 +17,7 @@ def annotated_gesture_managers(data_path):
             data_path / 'open_pinch_left', hand="left"),
         "open_pinch_right": open_pinch.AnnotatedGestureManager(
             data_path / 'open_pinch_right', hand="right"),
+        "video": video.AnnotatedGestureManager(
+            data_path / "video",
+        )
     }
