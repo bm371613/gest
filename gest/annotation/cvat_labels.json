@@ -1,0 +1,30 @@
+[
+  {
+    "name": "right",
+    "color": "#83e070",
+    "attributes": [
+      {
+        "name": "open",
+        "input_type": "checkbox",
+        "mutable": true,
+        "values": [
+          "false"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "left",
+    "color": "#df4242",
+    "attributes": [
+      {
+        "name": "open",
+        "input_type": "checkbox",
+        "mutable": true,
+        "values": [
+          "false"
+        ]
+      }
+    ]
+  }
+]
