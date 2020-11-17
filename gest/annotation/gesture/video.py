@@ -1,33 +1,47 @@
 import typing
 
 import cv2
+import numpy as np
+
+from gest.annotation import cvat
+from gest.cv_gui import crosshead, RIGHT_COLOR, OPEN_COLOR, LEFT_COLOR
 
 from . import base
 
 
 class PlaybackSession(base.PlaybackSession):
 
-    def __init__(self, frames, fps, started_at):
+    def __init__(self, frames, fps, started_at, annotations=None):
         self.frames = frames
         self.fps = fps
         self.started_at = started_at
+        self.annotations = annotations
 
     def render(self, at, size=None):
-        frame = self.frames[int((at - self.started_at) * self.fps) % len(self.frames)]
+        ix = int((at - self.started_at) * self.fps) % len(self.frames)
+        frame = self.frames[ix]
         if size is not None:
             frame = cv2.resize(frame, size)
+        if self.annotations is None:
+            return frame
+        for annotation in self.annotations[ix]:
+            color = {'left': LEFT_COLOR, 'right': RIGHT_COLOR}[annotation['hand']]
+            if annotation['label'] == 'open_pinch':
+                color = np.maximum(color, OPEN_COLOR)
+            frame = crosshead(frame, annotation['x'], annotation['y'], color * 255)
         return frame
 
 
 class AnnotatedGesture(base.AnnotatedGesture):
 
-    def __init__(self, name, frames, fps):
+    def __init__(self, name, frames, fps, annotations=None):
         self.name = name
         self.frames = frames
         self.fps = fps
+        self.annotations = annotations
 
     def start_playback_session(self, at):
-        return PlaybackSession(self.frames, self.fps, at)
+        return PlaybackSession(self.frames, self.fps, at, annotations=self.annotations)
 
 
 class CapturingSession(base.CapturingSession):
@@ -67,8 +81,14 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
         self.path = path
         self.annotated_gesture_class = annotated_gesture_class
 
+    @property
+    def annotations_path(self):
+        return self.path.with_suffix(self.path.suffix + '.xml')
+
     @classmethod
     def save(cls, annotated_gesture, path, annotated_gesture_class):
+        if annotated_gesture.annotations is not None:
+            raise NotImplementedError("Saving video annotations is not implemented")
         result = cls(path=path, annotated_gesture_class=annotated_gesture_class)
         path.parent.mkdir(parents=True, exist_ok=True)
         writer = cv2.VideoWriter(
@@ -96,10 +116,15 @@ class SavedAnnotatedGesture(base.SavedAnnotatedGesture):
             name=self.path.stem,
             frames=frames,
             fps=fps,
+            annotations=(
+                cvat.load_video_annotations(self.annotations_path)
+                if self.annotations_path.exists() else None
+            )
         )
 
     def remove(self):
         self.path.unlink()
+        self.annotations_path.unlink()
 
 
 class AnnotatedGestureManager(base.AnnotatedGestureManager):

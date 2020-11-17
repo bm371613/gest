@@ -3,9 +3,9 @@ import numpy as np
 
 from gest.math import relative_average_coordinate
 
-LEFT_COLOR = (0., 0., 1.)
-RIGHT_COLOR = (0., 1., 0.)
-OPEN_COLOR = (1., 0., 0.)
+LEFT_COLOR = np.array((0., 0., 1.))
+RIGHT_COLOR = np.array((0., 1., 0.))
+OPEN_COLOR = np.array((1., 0., 0.))
 
 
 def text(frame, text, scale=1, thickness=1, font=cv2.FONT_HERSHEY_SIMPLEX, point=(0, 1),
